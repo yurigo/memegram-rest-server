@@ -20,6 +20,7 @@ class UsersDAO extends GenericDAO {
         user.password = undefined;
         return user;
     }
+
 }
 
 module.exports = UsersDAO
