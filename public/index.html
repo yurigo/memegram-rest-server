@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦄 Memegram 🦄</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #333;
+        }
+
+        h1{
+            text-align: center;
+        }
+
+        /* .memes{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1em;
+
+        }
+        .memes img{
+            width: 200px;
+            
+        } */
+
+        .memes {
+            column-count: auto;
+            column-width: 15rem;
+            column-gap: 20px;
+            padding: 15px;
+            overflow: visible;
+            margin: 15px;
+        }
+
+        .memes div {
+            position: relative;
+            display: inline-block;
+            /* position:relative; */
+            margin-bottom: 18px;
+            border-radius: 10px;
+            /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); */
+            /* box-shadow: 0 0 10px -5px black; */
+            cursor: pointer;
+            transition: all 0.1s ease-in-out;
+            border: 4px solid transparent;
+        }
+
+        .memes img{
+            width: 100%;
+            height: auto;
+        }
+
+        .memes div:hover{
+            transform: perspective(256px) translateZ(-8px) ;
+            border: 4px solid #fff;
+        }
+
+        @media screen and (max-width: 1200px) {
+            .memes {
+                padding: 4px;
+            }
+            .memes > img {
+                margin-bottom: 4px;
+            }
+        }
+
+        .memes button{
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+        
+            display: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 3em;
+
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .memes img:hover + button,
+        .memes button:hover {
+            display: inline-block;
+        }
+        
+        .memes button:hover {
+            transform: rotate(90deg);
+            transition: transform 0.1s linear;
+        }
+
+        .memes button:active {
+            transform: rotate(45deg) scale(0.8);
+        }
+
+        .memes div:active {
+            transform: perspective(256px) translateZ(0px) ;
+        }
+
+    </style>
+
+</head>
+<body>
+    <h1>
+        🦄 memegram 🦄
+    </h1>
+
+    <div class="memes"></div>
+
+    <form id="form">
+        <input type="number" name="idUser" placeholder="user" required>
+        <!-- <input type="text" name="image" placeholder="image"> -->
+
+        <select name="image" required>
+            <option value="1.jpg">1.jpg</option>
+            <option value="2.jpg">2.jpg</option>
+            <option value="3.jpg">3.jpg</option>
+            <option value="4.jpg" selected>4.jpg</option>
+            <option value="5.jpg">5.jpg</option>
+            <option value="6.jpg">6.jpg</option>
+            <option value="7.jpg">7.jpg</option>
+            <option value="8.jpg">8.jpg</option>
+            <option value="9.jpg">9.jpg</option>
+            <option value="10.jpg">10.jpg</option>
+            <option value="11.jpg">11.jpg</option>
+            <option value="12.jpg">12.jpg</option>
+            <option value="13.jpg">13.jpg</option>
+            <option value="14.jpg">14.jpg</option>
+            <option value="15.jpg">15.jpg</option>
+        </select>
+
+        <input type="submit" value="Submit">
+    </form>   
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+
+        var form = document.getElementById('form');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const idUser = form.elements.idUser.value;
+            const image = form.elements.image.value;
+        
+            console.log(idUser , image);
+
+            fetch("/posts",
+            {
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+                },
+                method: "POST",
+                body: JSON.stringify({idUser , image})
+            })
+            .then(function(res){ return res.json() })
+            .then(function(data){
+                addMeme(data);
+            })
+            .catch(function(res){ console.log(res) })
+
+        });
+
+        fetch("/posts",
+            {
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+                },
+            })
+            .then(function(res){ return res.json() })
+            .then(function(data){
+                data.forEach(function(post){
+                    addMeme(post);
+                });
+            });
+
+
+        function addMeme(post){
+            const memeImage = document.createElement('img');
+            memeImage.src = `http://yurigo.dev/img/${post.image}`;
+            memeImage.alt = post.image;
+            memeImage.title = post.image;
+            
+            const divImage = document.createElement('div');
+            divImage.appendChild(memeImage);
+            divImage.dataset.id = post.id;
+            divImage.dataset.idUser = post.idUser;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.innerHTML = '❌';
+
+            divImage.appendChild(deleteButton);
+
+            // meme.innerHTML = `
+            //     <img data-id="${post.id}" data-user="${post.idUser}" src="http://yurigo.dev/img/${post.image}">
+            // `;
+
+            document.querySelector('.memes').appendChild(divImage);
+
+            // memeImage.addEventListener('click', function(e){
+            //     console.log(e.target.dataset.id);
+            //     console.log(e.target.dataset.user);
+
+            //     fetch("/posts/" + e.target.dataset.id,
+            //     {
+            //         headers: {
+            //         'Accept': 'application/json',
+            //         'Content-Type': 'application/json'
+            //         },
+            //         method: "DELETE"
+            //     })
+            //     .then(function(res){ 
+            //         console.log(res)
+            //         if (res.ok) e.target.remove();
+            //     })
+            //     .catch(function(res){ console.log(res) })
+            // });
+
+            deleteButton.addEventListener('click', function(e){
+                console.log(e.target.parentNode.dataset.id);
+                console.log(e.target.parentNode.dataset.idUser);
+
+                fetch("/posts/" + e.target.parentNode.dataset.id,
+                {
+                    headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                    },
+                    method: "DELETE"
+                })
+                .then(function(res){ 
+                    console.log(res)
+                    if (res.ok) e.target.parentNode.remove();
+                })
+                .catch(function(res){ console.log(res) })
+            });
+        }
+
+
+
+
+
+    </script>
+</body>
+</html>

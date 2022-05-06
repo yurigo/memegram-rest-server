@@ -28,8 +28,11 @@ class GenericDAO {
     }
 
     async delete(id) {
-        throw new Error("not implemented")
-        return {}
+        console.log(`DELETE FROM ${this.tabla} WHERE id = '${id}'`)
+        const [results] = await global.connection.promise().query("DELETE FROM ?? where id = ?", [this.tabla, id])
+
+        // throw new Error("not implemented")
+        // return {}
     }
 
 }
