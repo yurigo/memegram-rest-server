@@ -3,6 +3,7 @@ require("dotenv").config()
 const express = require('express')
 const morgan = require('morgan')
 const helmet = require("helmet");
+const cors = require("cors");
 
 const mysql = require("mysql2")
 global.connection = mysql.createConnection(process.env.DATABASE_URL);
@@ -15,6 +16,7 @@ const postsRoute = require('./routes/posts.route')
 
 app.use(morgan('tiny'))
 // app.use(helmet());
+app.use(cors());
 
 app.use(express.json())  // convierte el body (bytes) -> objeto json
 
