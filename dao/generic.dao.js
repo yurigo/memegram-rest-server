@@ -32,7 +32,7 @@ class GenericDAO {
         const [results] = await global.connection.promise().query("DELETE FROM ?? where id = ?", [this.tabla, id])
 
         // throw new Error("not implemented")
-        // return {}
+        return {results}
     }
 
 }
