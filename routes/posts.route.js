@@ -15,7 +15,8 @@ router.get("/:id", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
     // INSERT INTO POSTS (id, nombre, ...) values (body...)
-    next({ error: "not implemented" })
+    // body previamente verificado!!
+    res.json(await pdao.post(req.body))
 })
 
 router.put("/:id", async (req, res, next) => {
@@ -25,7 +26,8 @@ router.put("/:id", async (req, res, next) => {
 
 router.delete("/:id", async (req, res, next) => {
     // DELETE FROM POSTS WHERE id = params.id
-    next({ error: "not implemented" })
+    await pdao.delete(req.params.id)
+    res.status(204).end() //.json(await pdao.delete(req.params.id))
 })
 
 

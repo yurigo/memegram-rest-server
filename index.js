@@ -10,13 +10,18 @@ global.connection = mysql.createConnection(process.env.DATABASE_URL);
 const app = express()
 const port = 3000
 
+app.use(morgan('tiny'))
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  }));
+app.use(express.json()) 
+
+app.use(express.static("public"))
+
 const usersRoute = require('./routes/users.route')
 const postsRoute = require('./routes/posts.route')
 
-app.use(morgan('tiny'))
-// app.use(helmet());
-
-app.use(express.json())  // convierte el body (bytes) -> objeto json
 
 app.use("/users", usersRoute)
 app.use("/posts", postsRoute)
@@ -27,5 +32,6 @@ app.get('*', (req, res) => {
 
 app.listen(port, () => {
     console.log(`http://localhost:${port}`)
-    console.log(`http://localhost:${port}/graphql`)
+    console.log(`http://localhost:${port}/users`)
+    console.log(`http://localhost:${port}/posts`)
 })
