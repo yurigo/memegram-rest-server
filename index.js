@@ -27,9 +27,18 @@ io.on('connection', async (socket) => {
     socket.emit("posts" , posts )
 
     socket.on('insert post', async (data) => {
+        // can i insert a post?
+        // does data have all the fields?
         const postInserted = await pdao.post(data)
         // socket.broadcast.emit('new post' , postInserted)
         io.emit('new post' , postInserted)
+    })
+
+    socket.on('delete post' , async (data) => {
+        // can i delete this post?
+        const postDeleted = await pdao.delete(data.id)
+        // if all went well then we can send the id of the deleted post:
+        io.emit('deleted post' , { id: data.id })  
     })
 
     socket.on('disconnect', () => {

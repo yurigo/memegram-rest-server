@@ -14,6 +14,10 @@ socket.on('new post', (data) => {
     addMeme(data);
 })
 
+socket.on('deleted post', (data) => {
+    deleteMeme(data.id);
+})
+
 // fetch("http://localhost:3000/posts" ,
 //     {
 //         headers: {
@@ -63,7 +67,9 @@ form.addEventListener('submit', function(e) {
 
 
 
-
+function deleteMeme(id){
+    document.querySelector('.memes').removeChild(document.querySelector(`[data-id="${id}"]`));
+}
 
 
 function addMeme(post){
@@ -73,9 +79,15 @@ function addMeme(post){
     memeImage.title = post.image;
     
     const divImage = document.createElement('div');
-    divImage.appendChild(memeImage);
     divImage.dataset.id = post.id;
     divImage.dataset.idUser = post.idUser;
+    
+    // const info = document.createElement('div');
+    // info.innerHTML = `<span>${post.id}</span> - <span>${post.idUser}</span>`;
+    // info.classList.add('info');
+    // divImage.appendChild(info);
+
+    divImage.appendChild(memeImage);
 
     const deleteButton = document.createElement('button');
     deleteButton.innerHTML = '❌';
@@ -84,19 +96,23 @@ function addMeme(post){
         console.log(e.target.parentNode.dataset.id);
         console.log(e.target.parentNode.dataset.idUser);
 
-        fetch("/posts/" + e.target.parentNode.dataset.id,
-        {
-            headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-            },
-            method: "DELETE"
-        })
-        .then(function(res){ 
-            console.log(res)
-            if (res.ok) e.target.parentNode.remove();
-        })
-        .catch(function(res){ console.log(res) })
+        // fetch("/posts/" + e.target.parentNode.dataset.id,
+        // {
+        //     headers: {
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'application/json'
+        //     },
+        //     method: "DELETE"
+        // })
+        // .then(function(res){ 
+        //     console.log(res)
+        //     if (res.ok) e.target.parentNode.remove();
+        // })
+        // .catch(function(res){ console.log(res) })
+
+        socket.emit("delete post" , {id: e.target.parentNode.dataset.id , idUser: e.target.parentNode.dataset.idUser} )
+
+
     });
 
     divImage.appendChild(deleteButton);
